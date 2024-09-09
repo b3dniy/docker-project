@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  monitoring:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - mynetwork
+
+  dns-1:
+    image: pihole/pihole
+    ports:
+      - "53:53/udp"
+    networks:
+      - mynetwork
+    environment:
+      - DNS1=8.8.8.8
+      - DNS2=8.8.4.4
+      - WEBPASSWORD=kozlovAD123
+
+  wordpress:
+    image: wordpress
+    ports:
+      - "8080:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: kozlovAD
+      WORDPRESS_DB_PASSWORD: kozlovAD123
+      WORDPRESS_DB_NAME: kozlovADdb
+    networks:
+      - mynetwork
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: kozlovAD
+      MYSQL_DATABASE: kozlovADdb
+      MYSQL_USER: kozlovAD
+      MYSQL_PASSWORD: kozlovAD123
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
